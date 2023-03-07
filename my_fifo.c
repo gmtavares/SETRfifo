@@ -1,13 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "my_fifo.h"
 
-typedef struct {
+/*typedef struct {
 	int *buffer;
 	int size;
 	int head;
 	int tail;
 	int count;
-} FIFO;
+} FIFO;*/
 
 void MyFIFOInit(FIFO *fifo, int size) {
 	if (!fifo) {

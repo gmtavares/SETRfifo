@@ -3,6 +3,7 @@
  * @brief A test application for the FIFO module
  */
  
+#include <stdlib.h>
 #include <stdio.h>
 #include "my_fifo.h"
 
@@ -83,9 +84,12 @@ int main() {
 
 	// Try to remove an item from the empty FIFO
 	int item3 = MyFIFORemove(&fifo);
-
+	int item4 = MyFIFORemove(&fifo);
+	int item5 = MyFIFORemove(&fifo);
+	int item6 = MyFIFORemove(&fifo);
+	
 	// Verify that the FIFO is still empty and that no item was removed
-	if (MyFIFOSize(&fifo) != 0 || item3 != 0) {
+	if (MyFIFOSize(&fifo) != 0 || item6 != 0) {
 		printf("ERROR: FIFO size changed or item removed from empty FIFO\n");
 		return 1;
 	}
