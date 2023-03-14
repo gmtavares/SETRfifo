@@ -2,7 +2,7 @@
  * @file main.c
  * @brief A test application for the FIFO module
  */
- 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "my_fifo.h"
@@ -34,18 +34,40 @@
 int main() {
 	// Initialize a FIFO with size 3
 	FIFO fifo;
-	MyFIFOInit(&fifo, 3);
-
+	if (MyFIFOInit(&fifo, 3) == 1) {
+		printf("ERROR: FIFO failed to initialize\n");
+	}
+	else {
+		printf("SUCCESS: FIFO initialized\n");
+	}
 	// Verify that the FIFO is empty
 	if (MyFIFOSize(&fifo) != 0) {
 		printf("ERROR: FIFO is not empty after initialization\n");
 		return 1;
 	}
+	else {
+		printf("SUCCESS: FIFO initialized as empty\n");
+	}
+
+	int insertCount = 0;
 
 	// Add some items to the FIFO
-	MyFIFOInsert(&fifo, 1);
-	MyFIFOInsert(&fifo, 2);
-	MyFIFOInsert(&fifo, 3);
+	if (MyFIFOInsert(&fifo, 1) == 1) {
+		printf("ERROR: FIFO failed to insert\n");
+		insertCount++;
+	}
+	if (MyFIFOInsert(&fifo, 2) == 1) {
+		printf("ERROR: FIFO failed to insert\n");
+		insertCount++;
+	}
+	if (MyFIFOInsert(&fifo, 3) == 1) {
+		printf("ERROR: FIFO failed to insert\n");
+		insertCount++;
+	}
+	if(insertCount==3) {
+		printf("SUCCESS: Added all items to the FIFO");
+	}
+
 
 	// Verify that the FIFO is full
 	if (MyFIFOSize(&fifo) != 3) {
@@ -54,12 +76,17 @@ int main() {
 	}
 
 	// Try to add an item to the full FIFO
-	MyFIFOInsert(&fifo, 4);
+	if (MyFIFOInsert(&fifo, 4) == 1) {
+		printf("SUCCESS: FIFO failed to insert\n");
+	}
 
 	// Verify that the FIFO is still full and that the new item was not added
 	if (MyFIFOSize(&fifo) != 3) {
 		printf("ERROR: FIFO size changed after attempting to insert item into full FIFO\n");
 		return 1;
+	}
+	else {
+		printf("SUCCESS: FIFO is still full and new item was not added\n");
 	}
 
 	// Remove some items from the FIFO
@@ -71,6 +98,9 @@ int main() {
 		printf("ERROR: Incorrect items removed from FIFO\n");
 		return 1;
 	}
+	else {
+		printf("SUCCESS: Correct items removed from FIFO\n");
+	}
 
 	// Add some more items to the FIFO
 	MyFIFOInsert(&fifo, 4);
@@ -80,6 +110,9 @@ int main() {
 	if (MyFIFOSize(&fifo) != 3) {
 		printf("ERROR: FIFO is not full after adding more items\n");
 		return 1;
+	}
+	else {
+		printf("SUCCESS: FIFO is full again\n");
 	}
 
 	// Try to remove an item from the empty FIFO
@@ -92,6 +125,9 @@ int main() {
 	if (MyFIFOSize(&fifo) != 0 || item6 != 0) {
 		printf("ERROR: FIFO size changed or item removed from empty FIFO\n");
 		return 1;
+	}
+	else {
+		printf("SUCCESS: FIFO is still empty and that no item was removed\n");
 	}
 
 	// Return success if all tests passed

@@ -22,16 +22,18 @@ typedef struct {
  *
  * @param fifo A pointer to the FIFO to initialize
  * @param size The size of the FIFO
+ * @return 1 if there was an error
  */
-void MyFIFOInit(FIFO *fifo, int size);
+int MyFIFOInit(FIFO *fifo, int size);
 
 /**
  * @brief Add an item to the FIFO
  *
  * @param fifo A pointer to the FIFO to add the item to
  * @param item The item to add to the FIFO
+ * @return 1 if there was an error
  */
-void MyFIFOInsert(FIFO *fifo, int item);
+int MyFIFOInsert(FIFO *fifo, int item);
 
 /**
  * @brief Remove and return an item from the FIFO

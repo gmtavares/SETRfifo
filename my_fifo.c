@@ -10,19 +10,19 @@
 	int count;
 } FIFO;*/
 
-void MyFIFOInit(FIFO *fifo, int size) {
+int MyFIFOInit(FIFO *fifo, int size) {
 	if (!fifo) {
 		#ifdef DEBUG
 			printf("FIFO pointer is NULL\n");
 		#endif
-		return;
+		return 1;
 	}
 	fifo->buffer = (int*)malloc(size * sizeof(int));
 	if (!fifo->buffer) {
 		#ifdef DEBUG
 			printf("Failed to allocate buffer\n");
 		#endif
-		return;
+		return 1;
 	}
 	fifo->size = size;
 	fifo->head = 0;
@@ -31,20 +31,21 @@ void MyFIFOInit(FIFO *fifo, int size) {
 	#ifdef DEBUG
 		printf("FIFO initialized with size %d\n", size);
 	#endif
+	return 0;
 }
 
-void MyFIFOInsert(FIFO *fifo, int item) {
+int MyFIFOInsert(FIFO *fifo, int item) {
 	if (!fifo) {
 		#ifdef DEBUG
 			printf("FIFO pointer is NULL\n");
 		#endif
-		return;
+		return 1;
 	}
 	if (fifo->count == fifo->size) {
 		#ifdef DEBUG
 			printf("FIFO is full\n");
 		#endif
-		return;
+		return 1;
 	}
 	fifo->tail = (fifo->tail + 1) % fifo->size;
 	fifo->buffer[fifo->tail] = item;
@@ -52,6 +53,7 @@ void MyFIFOInsert(FIFO *fifo, int item) {
 	#ifdef DEBUG
 		printf("Item %d inserted in FIFO\n", item);
 	#endif
+	return 0;
 }
 
 int MyFIFORemove(FIFO *fifo) {
