@@ -109,3 +109,60 @@ int MyFIFOSize(FIFO *fifo) {
 	#endif
 	return fifo->count;
 }
+
+int MyFIFOPrint(FIFO* fifo)
+	{
+	//check if the FIFO is full
+	if(MyFIFOSize(fifo) == 0)
+		{
+		#ifdef DEBUG
+			printf("->FIFO empty!!!\n");
+		#endif
+		return 1;
+		}
+
+	//print the FIFO's array
+	int cnt = fifo->count;
+	int idx = fifo->head;
+
+	while(cnt > 0)
+		{
+		printf("Value %d: %d\n", (fifo->count - cnt + 1), fifo->buffer[idx]);
+		idx = (idx + 1) % fifo->size;//circular way
+		cnt--;
+		}
+	return 0;
+	}
+	
+
+int FIFOResize(FIFO *fifo, int newSize) {
+	if (newSize < fifo->count) {
+		#ifdef DEBUG
+			printf("FIFO cannot be resized to a smaller size than the current number of elements.\n");
+		#endif
+		return 1;
+	}
+
+	int *new_buffer = (int*) malloc(newSize * sizeof(int));
+	if (new_buffer == NULL) {
+		#ifdef DEBUG
+			printf("Error: Failed to allocate memory for new buffer.\n");
+		#endif
+		return 1;
+	}
+
+	// Copy elements to the new buffer
+	int i, j;
+	for (i = fifo->head, j = 0; j < fifo->count; ++i, ++j) {
+		if (i == fifo->size) i = 0;
+		new_buffer[j] = fifo->buffer[i];
+	}
+
+	free(fifo->buffer);
+	fifo->buffer = new_buffer;
+	fifo->size = newSize;
+	fifo->head = 0;
+	fifo->tail = fifo->count;
+
+	return 0;
+}

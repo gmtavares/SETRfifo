@@ -59,4 +59,22 @@ int MyFIFOPeep(FIFO *fifo);
  */
 int MyFIFOSize(FIFO *fifo);
 
+
+/**
+ * @brief Prints the current elements of the FifO
+ * 
+ * @param fifo Pointer to the FIFO
+ * @return 1 if error
+*/
+int MyFIFOPrint(FIFO* fifo);
+
+/**
+ * @brief Resizes the FIFO to a new size, clearing the old memory but keeping the elements
+ *
+ * @param fifo A pointer to the FIFO to return the size of
+ * @param newSize The new size of the FIFO
+ * @return 1 if error
+ */
+int FIFOResize(FIFO *fifo, int newSize);
+
 #endif /* MY_FIFO_H */

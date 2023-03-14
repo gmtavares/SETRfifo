@@ -1,11 +1,20 @@
 /**
  * @file main.c
- * @brief A test application for the FIFO module
- */
+ * @remarks Note: using Whitesmiths indetation
+ * @author (2023) José Ribeiro, 72473 <j.miguel.ribeiro at ua.pt>
+ * @author (2023) Gonçalo Tavares 93030 <gmtavares at ua.pt>
+*/
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <stdio.h>//to use printf, scanf
+#include <stdlib.h>//to use malloc
+#include <errno.h>//to use system error numbers (EPERM, EINVAL, ESRCH, ENOSPC, (...))
+#include <assert.h>//to use asserts
+
 #include "my_fifo.h"
+
+int menuOption, value, c;//local variables declaration
+int insertCount = 0;
+
 
 /**
  * @brief Main function of the test application
@@ -23,6 +32,7 @@
  * - Removes two items from the FIFO.
  * - Verifies that the removed items are correct.
  * - Adds two more items to the FIFO to fill it up again.
+ * - Resizes the FIFO to size 5
  * - Verifies that the FIFO is full again.
  * - Tries to remove an item from the empty FIFO.
  * - Verifies that the FIFO is still empty and that no item was removed.
@@ -31,7 +41,7 @@
  * @return 0 if all tests passed, non-zero otherwise
  */
 
-int main() {
+int AutoTest() {
 	// Initialize a FIFO with size 3
 	FIFO fifo;
 	if (MyFIFOInit(&fifo, 3) == 1) {
@@ -64,7 +74,7 @@ int main() {
 		printf("ERROR: FIFO failed to insert\n");
 		insertCount++;
 	}
-	if(insertCount==3) {
+	if(insertCount==0) {
 		printf("SUCCESS: Added all items to the FIFO");
 	}
 
@@ -105,7 +115,19 @@ int main() {
 	// Add some more items to the FIFO
 	MyFIFOInsert(&fifo, 4);
 	MyFIFOInsert(&fifo, 5);
+	 printf("FIFO before resizing: \n");
+	MyFIFOPrint(&fifo);
 
+	int newSize = 5;
+	int result = FIFOResize(&fifo, newSize);
+
+	if(result == 0) {
+		printf("FIFO after resizing to %d: \n", newSize);
+		MyFIFOPrint(&fifo);
+	}
+	else {
+	printf("Failed to resize FIFO.\n");
+	}
 	// Verify that the FIFO is full again
 	if (MyFIFOSize(&fifo) != 3) {
 		printf("ERROR: FIFO is not full after adding more items\n");
@@ -129,8 +151,223 @@ int main() {
 	else {
 		printf("SUCCESS: FIFO is still empty and that no item was removed\n");
 	}
-
 	// Return success if all tests passed
 	printf("FIFOTester: All tests passed!\n");
 	return 0;
 }
+
+
+
+
+/**********************************************************/
+static void printMenu()
+	{
+	printf("+===============================================+\n"
+		   "|            Manipulation functions             |\n"
+		   "+===============================================+\n"
+		   "| 1: Initialization of FIFO                     |\n"
+		   "| 2: Insert new element in FIFO                 |\n"
+		   "| 3: Peak tail (newest) element of the FIFO     |\n"
+		   "| 4: Remove head (oldest) element from FIFO     |\n"
+		   "| 5: isFull()                                   |\n"
+		   "| 6: isEmpty()                                  |\n"
+		   "| 7: size()                                     |\n"
+		   "| 8: print()                                    |\n"
+		   "| 9: Resize()                                   |\n"
+		   "| 10: AutoTest()                                |\n"
+		   "| 0: Quit                                       |\n"
+		   "+===============================================+\n\n");
+	}
+/**********************************************************/
+
+/**********************************************************/
+static void readMenuOption()
+	{
+	menuOption = -1;
+	do
+		{
+		printf("Option: ");
+		scanf("%d", &menuOption);
+
+		//flushes the stdin
+		while(((c = getchar()) != '\n') && (c != EOF));//solution from the internet
+
+		if((menuOption < 0) || (menuOption > 10)) printf("  Invalid value!\n");
+		}
+	while((menuOption < 0) || (menuOption > 10));
+	//printf("Selected: %d\n", menuOption);
+	}
+/**********************************************************/
+
+int main()
+	{
+	printMenu();
+	while(1)
+		{
+		//printMenu();
+		readMenuOption();//read the input of the menu option
+
+		switch(menuOption)
+			{
+			/******************************************************************/
+			case(0)://Exit
+				printf("  Exit!!!\n");
+				return(0);
+			/******************************************************************/
+			case(1)://FIFO initialization
+				printf("  ->FIFO initialization\n");
+
+				//------------------------------------------
+				//read the input of the FIFO's size
+				do
+					{
+					printf("  FIFO size (>0): ");
+					scanf("%d", &value);//read the input number
+
+					//flushes the stdin
+					while(((c = getchar()) != '\n') && (c != EOF));//solution from the internet
+
+					//invalid input size
+					if(value <= 0) printf("  Invalid size!\n");
+					}
+				while(value <= 0);
+				//------------------------------------------
+
+				FIFO fifo;//declaration of the FIFO
+
+				//initialization of the FIFO
+				if(MyFIFOInit(&fifo, value) == 1)
+					{
+					printf("ERROR: FIFO failed to initialize\n");
+					}
+				else
+					{
+					printf("SUCCESS: FIFO initialized\n");
+					}
+
+				// Verify that the FIFO is empty
+				if(MyFIFOSize(&fifo) != 0)
+					{
+					printf("ERROR: FIFO is not empty after initialization\n");
+					return(1);
+					}
+				else
+					{
+					printf("SUCCESS: FIFO initialized as empty\n");
+					}
+				break;
+			/******************************************************************/
+			case(2)://FIFO insert
+				printf("  ->FIFO insert\n");
+
+				//------------------------------------------
+				//read the input of the FIFO's size
+				printf("  element: ");
+				scanf("%d", &value);//error -> allowing letters and chars
+
+				//flushes the stdin
+				while(((c = getchar()) != '\n') && (c != EOF));//solution from the internet
+				//------------------------------------------
+
+				if(MyFIFOInsert(&fifo, value) == 1)
+					{
+					printf("ERROR: FIFO failed to insert\n");
+					}
+				else
+					{
+					insertCount++;
+					}
+
+				break;
+			/******************************************************************/
+			case(3)://FIFO peak
+				printf("  ->FIFO peak\n");
+				value = MyFIFOPeep(&fifo);
+				printf("  Peaked element: %d\n", value);
+				break;
+			/******************************************************************/
+			case(4)://FIFO remove head
+				printf("  ->FIFO remove\n");
+
+				int item1 = MyFIFORemove(&fifo);
+
+				if(item1 == 0)//empty
+					{
+					printf("->FIFO empty!!!\n");
+					}
+				else
+					{
+					printf("->Sucessful removal!!!\n");
+					}
+
+				break;
+			/******************************************************************/
+			case(5)://isFull()
+				printf("  ->FIFO isFull\n");
+
+				//check if the FIFO is full
+				if(MyFIFOSize(&fifo) == fifo.size)
+					{
+					printf("->FIFO full!!!\n");
+					}
+				else
+					{
+					printf("->FIFO not full!!!\n");
+					}
+				break;
+			/******************************************************************/
+			case(6)://isEmpty()
+				printf("  ->FIFO isEmpty\n");
+
+				//check if the FIFO is full
+				if(MyFIFOSize(&fifo) == 0)
+					{
+					printf("->FIFO empty!!!\n");
+					}
+				else
+					{
+					printf("->FIFO not empty!!!\n");
+					}
+				break;
+			/******************************************************************/
+			case(7)://size()
+				printf("  ->FIFO size = %d\n",MyFIFOSize(&fifo));
+				break;
+			/******************************************************************/
+			case(8)://print()
+				printf("  ->FIFO print: \n");
+				MyFIFOPrint(&fifo);
+				break;
+			/******************************************************************/
+			case(9)://Resize()
+				printf("  ->FIFO resize: \n");
+				printf("  New Size: ");
+				scanf("%d", &value);//error -> allowing letters and chars
+				//flushes the stdin
+				while(((c = getchar()) != '\n') && (c != EOF));//solution from the internet
+				printf("FIFO before resizing: \n");
+				MyFIFOPrint(&fifo);
+				int result = FIFOResize(&fifo, value);
+				if(result == 0) {
+					printf("FIFO after resizing to %d: \n", value);
+					MyFIFOPrint(&fifo);
+				}
+				else {
+				printf("Failed to resize FIFO.\n");
+				}
+				break;
+			/******************************************************************/
+			case(10)://size()
+				printf("  ->FIFO AutoTest\n");
+				if(AutoTest() == 1)
+					printf("Tests Failed\n");
+				break;
+			/******************************************************************/
+			default:
+				break;
+			/******************************************************************/
+			}
+		menuOption = -1;//resets the menuOption
+		}
+	return(0);
+	}
